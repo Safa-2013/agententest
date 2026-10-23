@@ -1,0 +1,48 @@
+S.G.D. AGENTENAKADEMIE – SUPABASE ONLINE EINRICHTUNG
+====================================================
+
+Die Agentenakademie ist aktuell ein statisches GitHub-Pages-Spiel.
+Die hier bereitgestellte index.html kann Supabase Auth und eine zentrale
+Datenbank verwenden, sobald das neue Supabase-Projekt verbunden ist.
+
+SICHERHEIT
+- Benutze ein NEUES Supabase-Projekt nur für die Agentenakademie.
+- Erlaube in einem öffentlichen GitHub Repository keine echten Passwörter im HTML.
+- sgd-cloud-config.js darf NUR die Supabase Publishable Key enthalten.
+  NIEMALS service_role, Secret Key, Datenbankpasswort oder Access Token hineinschreiben.
+- Sammle bei Schulkindern möglichst keine unnötigen Klarnamen und Daten.
+- Bestehende Browser-Accounts sind KEINE Supabase Auth Accounts.
+
+1. Eigenes Supabase Projekt erstellen (z. B. S.G.D. Agentenakademie).
+2. In Supabase SQL Editor die Datei supabase_agentenakademie.sql ausführen.
+3. Supabase Authentication: E-Mail/Passwort aktivieren, E-Mail-Bestätigung
+   beibehalten. Unter Auth -> URL Configuration die echte GitHub Pages URL als
+   Site URL und Redirect URL freigeben, z. B.
+   https://safa-2013.github.io/agententest/
+4. Unter Supabase Project Settings / Connect das Projekt-URL und die
+   PUBLISHABLE API Key kopieren.
+5. sgd-cloud-config.js öffnen und URL/PUBLISHABLE KEY eintragen.
+6. index.html UND sgd-cloud-config.js in den ROOT-Ordner des GitHub Repos laden.
+7. Auf der veröffentlichten Website ONLINE neu registrieren. Auch Admin
+   'safa' benötigt ein NEUES Supabase Auth Konto mit bestätigter E-Mail.
+8. Im Supabase SQL Editor EINMAL als Projektinhaber ausführen:
+   UPDATE public.sgd_profiles SET role='admin' WHERE username='safa';
+   (Nur nachdem du sicher bist, dass das 'safa' Konto tatsächlich dir gehört.)
+9. Auf GitHub Pages als Admin neu anmelden. Online-Konten, Ergebnisse und
+   Ereignisse erscheinen dann automatisch, ungefähr alle 18 Sekunden.
+
+WAS AUTOMATISCH WIRD
+- neue Online-Konten auf anderen Geräten
+- Prüfungsergebnisse nach dem Abschluss
+- Logins / protokollierte Seitenaufrufe / Änderungen ab der Online-Nutzung
+- neue eigene Fragen und geänderte Lösungen
+- Rollen und Berechtigungen über Admin-Bereich
+
+WAS NOCH NICHT AUTOMATISCH IST
+- bereits vorhandene lokale Browser-Konten, Passwörter und alte Prüfungen
+- lokale Ausweiskarten: sie bleiben vorerst auf dem erstellenden Gerät
+- zurückliegende Aktivitäten, bevor Supabase aktiv ist
+- echte Prüfungsintegrität: Browserergebnisse können manipuliert werden
+
+Die HTML-Datei allein erstellt KEINE Supabase-Datenbank und kann eine
+bestehende Datenbank ohne Projektzugang nicht aktivieren.
