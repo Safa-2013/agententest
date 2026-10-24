@@ -1,0 +1,29 @@
+S.G.D. Agentenakademie – Version 14
+==================================
+
+INSTALLATION AUF GITHUB
+1. Öffne https://github.com/Safa-2013/agententest
+2. Öffne index.html und ersetze den bisherigen Inhalt durch die index.html aus diesem Paket (oder lade die Datei als Ersatz hoch).
+3. Speichere über „Commit changes“.
+4. Öffne https://safa-2013.github.io/agententest/ und lade die Seite bei Bedarf in Safari neu.
+
+NEU IN V14
+- Kommandozentrale: sechs große Menüpunkte; klassische Ausbildung ist einklappbar.
+- Vier fiktive Missionen mit vier Beweisstationen pro Fall; der nächste Fall wird nach einem Erfolg freigeschaltet.
+- Missionsfortschritt in Supabase je Online-Konto gespeichert; andere Benutzer können ihn nicht bearbeiten.
+- Karrierechronik und sechs automatische Spielauszeichnungen.
+- Agententeam: nur öffentlich freigegebene Ausweise; keine privaten Kontaktdaten im Verzeichnis.
+- Ausweisstudio: Profilfoto vergrößern, vertikal/horizontal verschieben und an Ausweisvorlage anpassen.
+- Öffentliche QR-Profilseite: Rang per Schaltfläche neu laden, bestehender QR-Code bleibt gleich.
+- iPhone: Anleitung zum Hinzufügen der Website zum Home-Bildschirm und App-Icon.
+- CEO-Rang bleibt ausschließlich für das Hauptadmin-Konto reserviert.
+- Kennzeichnung „Nur für Spielzwecke“ auf den Ausweisen bleibt erhalten.
+
+WICHTIG
+- Die Supabase-Datenbank wurde bereits um Missionen und das freigegebene Agententeam erweitert.
+- Keine neue Supabase-Anmeldung oder neue Datenbank erforderlich.
+- Bestehende Supabase-Konten, Ausweise und Prüfungsergebnisse werden nicht gelöscht.
+- Die neue HTML-Datei ist noch nicht automatisch auf GitHub veröffentlicht.
+- Missionsspiele und Ausweise wurden im Browser mit Testdaten getestet. Für die endgültige Freigabe sollten QR-Scan und Online-Synchronisierung mit zwei echten Handys nach dem GitHub-Upload geprüft werden.
+- Der Home-Bildschirm-Modus benötigt für Online-Funktionen Internet und ist keine vollständig offlinefähige App.
+- Alle Ausweise sind ausschließlich Requisiten für ein fiktives Rollenspiel.
