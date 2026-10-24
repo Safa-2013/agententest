@@ -1,0 +1,54 @@
+S.G.D. AGENTENAKADEMIE – V17
+=======================================
+
+INHALT
+- index.html (gesamte Website mit allen Funktionen aus V1–V16 und V17)
+- Screenshots der neuen Ansichten auf iPhone und Desktop
+- diese Anleitung
+
+NEU IN VERSION 17
+- Persönlicher Posteingang für neue Chatnachrichten, zugeteilte Aufträge,
+  eingereichte Berichte, Überarbeitungen, erfolgreiche Abschlüsse und Chatmeldungen.
+- Hinweise auf anstehende (24 Stunden) und überschrittene Fristen bei geöffnetem Konto.
+- Hinweise gelesen markieren; neue Hinweise werden auf allen Geräten synchronisiert.
+- Auftragsliste mit Suche, Prioritätsfilter und Fristenfilter.
+- Online-Berichtsentwürfe mit automatischem Speichern für den zugeteilten Agenten.
+- W-Fragen-, Ermittlungs- und sichere Vorfallbericht-Vorlagen.
+- Abgegebene Einsatzberichte als TXT-Datei herunterladen.
+- Agenturweite aggregierte Auftragsstatistik in der Admin-Leitstelle,
+  ohne private Chats anderer Agenten einzusehen.
+- Hinweise werden auch beim Login bzw. bei geöffneter Website regelmäßig aktualisiert.
+
+INSTALLATION
+1. In GitHub das Repository Safa-2013/agententest öffnen.
+2. Die bisherige index.html durch die beiliegende index.html ersetzen.
+3. Mit „Commit changes“ speichern und die Veröffentlichung abwarten.
+4. https://safa-2013.github.io/agententest/?v=17 öffnen.
+5. Mit deinem bisherigen Konto anmelden; keine erneute Registrierung nötig.
+
+SUPABASE
+Die neuen Tabellen, Richtlinien und Serverfunktionen wurden bereits im
+vorhandenen Supabase-Projekt S.G.D. Agentenakademie eingerichtet.
+Du musst die Datenbank nicht selbst importieren oder zurücksetzen.
+
+WICHTIG
+- Hinweise sind IN-APP-BENACHRICHTIGUNGEN und keine iOS-Push-Mitteilungen.
+  Bei geschlossener Website kommt daher keine Push-Mitteilung auf das Handy.
+- Online-Entwürfe benötigen eine aktive Internetverbindung; der Status unter
+  dem Texteingabefeld zeigt, ob der Text erfolgreich gespeichert wurde.
+- Private Daten aus echten Schulkonflikten oder Namen anderer Kinder bitte
+  nicht in das Rollenspiel schreiben. Bei realer Gefahr Lehrkräfte/Notdienste
+  einschalten; Agentenschüler sollen nicht selbst eingreifen.
+- Die echten Zwei-Handy-Tests können erst mit einem zweiten registrierten
+  Online-Konto abgeschlossen werden.
+- Nicht amtlich: Alle Ausweise und Funktionen sind nur für Spielzwecke.
+
+TESTS
+- JavaScript-Syntax in beiden eingebetteten Scripts geprüft.
+- Browserprüfungen für iPhone/Desktop: Posteingang, Aufträge, Leitstelle,
+  Berichtansicht ohne JavaScript-Ausnahme.
+- Berichteditor: Vorlage, Texteingabe und Online-Speicheraufruf geprüft.
+- Export eines vorhandenen Einsatzberichts als TXT-Datei überprüft.
+- Supabase: Testtransaktionen für Benachrichtigungen, Fristprüfung,
+  Entwurfsspeicherung und Berichtsabgabe; Testdaten zurückgerollt.
+- Anzahl produktiver Konten unverändert; keine Testaufträge gespeichert.
