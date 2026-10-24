@@ -1,0 +1,54 @@
+S.G.D. AGENTENAKADEMIE V15 – INSTALLATION UND NEUE FUNKTIONEN
+24.10.2026
+
+1. VERÖFFENTLICHUNG
+Öffne https://github.com/Safa-2013/agententest
+Ersetze die bisherige index.html durch die index.html aus diesem ZIP.
+Speichere auf GitHub mit „Commit changes“.
+Öffne anschließend https://safa-2013.github.io/agententest/?v=15
+Du brauchst dein bestehendes Supabase-Projekt nicht erneut einzurichten.
+
+2. DEIN KONTO
+Melde dich mit deinem bestehenden Online-Benutzernamen und deinem persönlichen Passwort an.
+Das Konto safa behält seine exklusive CEO-Position.
+Alte Konten, Prüfungen, Ausweise, Codes und Spielstände werden nicht zurückgesetzt.
+
+3. NEUE FUNKTIONEN
+- Neue Kommandozentrale mit zwölf Funktionen
+- Drei bereits veröffentlichte Live-Missionen
+- Admin kann weitere Missionen (2–8 Fragen) mit Beweisen anlegen
+- Richtige Lösungen sind nicht in der an Agenten gelieferten Fallakte enthalten
+- Serverseitige Auswertung der V15-Missionen
+- Einzel- und Teamzuweisungen
+- Ermittlungsteams mit gemeinsamen Fallnotizen und individuellen Teamhinweisen bei Teamaufträgen
+- Nachrichten der Spielleitung und Lesestatus
+- Monats- und Gesamtrangliste aus freigegebenen Codenamen
+- Freischaltbares Spielarchiv
+- Ermittlungslabor mit Caesar-Code, Mustervergleich und Verhörübung
+- QR-Spielausweis-Kontrolle mit Kameraerkennung, soweit vom Browser unterstützt
+- Profil-Bio und vorhandene Profilbild-/Ausweisfunktionen
+- V14-Missionen, Karriere, Urkunden und alte Spielmodi bleiben vorhanden
+- Regelmäßige Aktualisierung beim Wiederöffnen der Seite, zusätzlich alle 60 Sekunden bei geöffnetem Tab
+
+4. STARTABLAUF FÜR DEN CEO
+Klicke auf „CEO-Hauptquartier“.
+Neue Mission: „Neue Mission erstellen“ wählen, Beweise und Fragen eintragen, veröffentlichen.
+Einzelauftrag: einen Agenten auswählen und Auftrag zuweisen.
+Teamauftrag: unter „Teamermittlung“ zuerst ein Team erstellen und Mitglieder hinzufügen.
+Danach die veröffentlichte Mission im Hauptquartier dem Team zuweisen.
+Nachrichten: das Postfach öffnen, Empfängergruppe wählen und Nachricht absenden.
+
+5. DATENSCHUTZ UND SICHERHEIT
+Alle Ausweise sind fiktive Spielausweise.
+Öffentliche QR-Profile zeigen Name und Foto nur, wenn der Ausweisinhaber dies freigibt.
+Das Agententeam und die Rangliste verwenden freiwillig veröffentlichte Codenamen.
+Die V15-Missionslösungen werden serverseitig gespeichert und bewertet; Agenten bekommen vor der Abgabe keine Lösungsschlüssel.
+Die neue Rollenprüfung in Supabase ersetzt keine echte behördliche Identitätsprüfung.
+
+6. ERPROBUNG UND GRENZEN
+Bestanden: JavaScript-Syntaxprüfung; Browseransichten auf iPhone- und Desktop-Größe; Aufruf aller V15-Seiten; Altseiten V14 (Ausbildung, Karriere, Ausweis- und Adminverwaltung); Codeknacker und Auswahlspiele; Aufgabenentwurf; serverseitiger V15-Missionsdurchlauf; Team, Hinweise und Postfach per Supabase-Testtransaktion; Teamauftrag für simuliertes normales Agentenkonto (2 individuelle Hinweise, keine Lösungen); Schutz des Lösungsschlüssels.
+Nicht vollständig live getestet: Nutzung mit zwei echten verschiedenen Handys / Konten; Kameraerkennung auf allen iOS-Versionen; Netzwerkunterbrechungen und Offline-Nutzung.
+Der native Kamera-QR-Scanner ist abhängig von der Browserunterstützung; als Fallback kann man einen QR-Link einfügen.
+Diese einzelne HTML-Datei ist keine installierte native App und bietet keine Push-Nachrichten oder vollständigen Offline-Modus.
+
+Dateien: index.html und vier Vorschaugrafiken.
