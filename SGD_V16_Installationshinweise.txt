@@ -1,0 +1,59 @@
+S.G.D. AGENTENAKADEMIE — VERSION 16
+=================================
+
+Installation
+------------
+1. Entpacke die ZIP-Datei. Die Webseite ist die enthaltene index.html.
+2. Öffne https://github.com/Safa-2013/agententest
+3. Ersetze im Hauptverzeichnis die bisherige index.html durch diese Datei.
+4. Speichere die Änderung mit "Commit changes".
+5. Lade https://safa-2013.github.io/agententest/?v=16
+
+Supabase
+--------
+Die Tabellen und geschützten Serverfunktionen für V16 wurden bereits im Projekt
+S.G.D. Agentenakademie (yosetevxsbfrklyteoql) eingerichtet. Es sind keine
+Passwörter, SQL-Skripte oder Administrator-Geheimschlüssel in diesem Paket nötig.
+Die bisherigen Konten, Ausweise und Missionsdaten bleiben erhalten.
+
+Neu in V16
+----------
+- Agenten-Chat zwischen höheren und niedrigeren Rängen; auf gleicher Stufe
+  bei gemeinsamer Teammitgliedschaft
+- Private Einzelunterhaltungen, Lesestatus, Kontaktblockierung, Nachrichten melden
+- Hauptadmin-/Moderatorprüfung NUR für gemeldete Chats, kein allgemeiner
+  Zugriff auf alle privaten Unterhaltungen
+- Dienstaufträge ausschließlich von höheren an niedrigere Ränge
+- Aufgabenstatus: zugewiesen, angenommen, Bearbeitung, Bericht eingereicht,
+  Überarbeitung, abgeschlossen oder abgebrochen
+- Optional: Frist, Priorität und Aufgabenart
+- Berichtspflicht ab 40 Zeichen; Abnahme bzw. Überarbeitung durch Auftraggeber
+- Berichtsarchiv und protokollierter Bearbeitungsverlauf
+- CEO-Leitstelle: Berichtsabnahme und Chatmeldungen
+- Nachrichten werden während der Nutzung regelmäßig aktualisiert
+
+Hinweise
+--------
+* Dies ist ein fiktives Spielsystem. Bei einem wirklichen Streit: Abstand halten,
+  Erwachsene bzw. Lehrkräfte informieren und nicht selbst körperlich eingreifen.
+* In Chats und Berichten keine sensiblen privaten Kontaktdaten oder Namen
+  anderer Kinder weitergeben.
+* Kein Push-Nachrichtenversand auf ein gesperrtes Handy: Neue Nachrichten werden
+  angezeigt, wenn die Website geöffnet bzw. wieder aktiviert ist.
+* Normale Agenten benötigen eigene ONLINE-Konten in derselben Supabase-Datenbank.
+* Die Screenshots enthalten nur simulierte Beispiel-Nachrichten und Agent 743;
+  diese Testkonten wurden NICHT in deiner Online-Datenbank gespeichert.
+* Die tatsächliche Kommunikation zwischen zwei realen Geräten bleibt nach
+  Veröffentlichung noch abschließend zu prüfen.
+
+Prüfungen
+---------
+- JavaScript-Syntaxprüfung der bestehenden Skripte bestanden
+- Echte Supabase-Testtransaktionen: Nachricht, Auftrag, Pflichtbericht,
+  Überarbeitung, Abnahme und Moderationsmeldung bestanden; zurückgerollt
+- Berechtigungsprüfung: unterer Rang darf keinen Vorgesetzten beauftragen;
+  Schüler ohne gemeinsames Team können nicht untereinander chatten
+- UI-Tests auf iPhone- und Desktop-Abmessungen mit simulierten Testdaten:
+  Startseite, Chat, Nachrichten senden, Auftragsliste, Berichtsprüfung, Leitstelle
+
+Nur für Spielzwecke.
