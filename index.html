@@ -1186,6 +1186,19 @@ async function cloudReload(shouldRender=true){
 }
 function cloudValidateUsername(raw){const u=String(raw||'').trim().toLowerCase();if(!/^[a-z0-9._-]{3,24}$/.test(u))throw Error('Benutzername: 3–24 Zeichen; nur a–z, 0–9, Punkt, Bindestrich und Unterstrich.');return u}
 function cloudInternalEmail(raw){const u=cloudValidateUsername(raw);const hex=Array.from(new TextEncoder().encode(u),b=>b.toString(16).padStart(2,'0')).join('');return 'u-'+hex+'@accounts.sgd.example.com'}
+// Website accepts 8+ characters. Existing Supabase accounts with 10+ characters retain their original password.
+// For new 8–9 character passwords, use a stable derived credential because the existing
+// Supabase registration function currently checks for at least 10 characters.
+async function cloudBackendPassword(raw){
+ const pw=String(raw??'');
+ if(pw.length<8||pw.length>100)throw Error('Passwort: mindestens 8 und höchstens 100 Zeichen.');
+ if(pw.length>=10)return pw;
+ if(!globalThis.crypto?.subtle)throw Error('Sichere Anmeldung benötigt HTTPS.');
+ const bytes=new TextEncoder().encode('SGD password v1\u0000'+pw);
+ const digest=await crypto.subtle.digest('SHA-256',bytes);
+ return 'sgd8-'+Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,'0')).join('');
+}
+
 async function cloudReadFunctionError(error,data){if(data?.error)return String(data.error);try{const body=await error?.context?.json();if(body?.error)return String(body.error)}catch(_){}return error?.message||'Server nicht erreichbar.'}
 function cloudContactInput(raw,kind){const value=String(raw||'').trim();if(kind==='email'){if(value.length>254||(value&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)))throw Error('Ungültige optionale E-Mail-Adresse.')}else if(value&&(value.length>24||!/^[+0-9 ()/\-]{6,24}$/.test(value)))throw Error('Ungültige optionale Telefonnummer.');return value||null}
 async function cloudRegister(){
@@ -1193,7 +1206,7 @@ async function cloudRegister(){
   if(!CLOUD.sb)throw Error('Online-Anmeldung nicht bereit.');
   const username=cloudValidateUsername($('cloudUsername').value);
   const password=$('cloudPass').value;
-  if(password.length<10||password.length>100)throw Error('Passwort: mindestens 10 und höchstens 100 Zeichen.');
+  if(password.length<8||password.length>100)throw Error('Passwort: mindestens 8 und höchstens 100 Zeichen.');
   if(password!==$('cloudPassRepeat').value)throw Error('Passwörter stimmen nicht überein.');
   const displayName=$('cloudDisplay').value.trim()||username,alias=$('cloudAlias').value.trim()||username,group=$('cloudGroup').value.trim();
   if(username==='safa')throw Error('Der Hauptadminname safa ist reserviert. Bitte über „Anmelden“ mit safa und dem Start-PIN 1234 die Admin-Freischaltung öffnen.');
@@ -1201,10 +1214,10 @@ async function cloudRegister(){
   const contactEmail=cloudContactInput($('cloudContactEmail').value,'email'),contactPhone=cloudContactInput($('cloudContactPhone').value,'phone');
   const button=$('cloudRegisterSubmit');if(button)button.disabled=true;
   try{
-   const {data,error}=await CLOUD.sb.functions.invoke('sgd-username-auth',{body:{action:'register',username,password,displayName,alias,group,contactEmail,contactPhone}});
+   const {data,error}=await CLOUD.sb.functions.invoke('sgd-username-auth',{body:{action:'register',username,password:await cloudBackendPassword(password),displayName,alias,group,contactEmail,contactPhone}});
    if(error)throw Error(await cloudReadFunctionError(error,data));
    if(!data?.ok)throw Error(data?.error||'Registrierung fehlgeschlagen.');
-   const login=await CLOUD.sb.auth.signInWithPassword({email:cloudInternalEmail(username),password});
+   const login=await CLOUD.sb.auth.signInWithPassword({email:cloudInternalEmail(username),password:await cloudBackendPassword(password)});
    if(login.error)throw Error('Konto wurde erstellt. Bitte mit Benutzername und Passwort anmelden: '+login.error.message);
    await cloudSetSession(login.data.session,true);
   }finally{if(button)button.disabled=false}
@@ -1217,18 +1230,18 @@ async function cloudActivateInitialAdmin(){
   const password=$('cloudAdminActivationPassword')?.value||'';
   const repeat=$('cloudAdminActivationRepeat')?.value||'';
   if(!/^SGD-[a-f0-9]{20}$/.test(code))throw Error('Bitte den privaten einmaligen Admin-Code eingeben.');
-  if(password.length<10||password.length>100)throw Error('Neues Passwort: mindestens 10 und höchstens 100 Zeichen.');
+  if(password.length<8||password.length>100)throw Error('Neues Passwort: mindestens 8 und höchstens 100 Zeichen.');
   if(password==='1234')throw Error('1234 darf aus Sicherheitsgründen nicht das dauerhafte Admin-Passwort sein.');
   if(password!==repeat)throw Error('Die neuen Passwörter stimmen nicht überein.');
   const button=$('cloudAdminActivationButton');if(button)button.disabled=true;
   try{
    const {data,error}=await CLOUD.sb.functions.invoke('sgd-username-auth',{body:{
-     action:'register',username:'safa',password,displayName:'Safa',alias:'Safa',group:code,
+     action:'register',username:'safa',password:await cloudBackendPassword(password),displayName:'Safa',alias:'Safa',group:code,
      contactEmail:null,contactPhone:null
    }});
-   if(error)throw Error(await cloudReadFunctionError(error,data));
+   if(error){const message=await cloudReadFunctionError(error,data);throw Error(/Benutzername bereits vergeben oder Registrierung nicht möglich/i.test(message)?'Die Registrierung wurde vom Server abgelehnt. Bitte den aktuellen einmaligen Admin-Code verwenden und erneut versuchen.':'Admin-Freischaltung fehlgeschlagen: '+message);}
    if(!data?.ok)throw Error(data?.error||'Admin-Freischaltung fehlgeschlagen.');
-   const login=await CLOUD.sb.auth.signInWithPassword({email:cloudInternalEmail('safa'),password});
+   const login=await CLOUD.sb.auth.signInWithPassword({email:cloudInternalEmail('safa'),password:await cloudBackendPassword(password)});
    if(login.error)throw Error('Admin angelegt. Melde dich mit deinem neuen Passwort an: '+login.error.message);
    await cloudSetSession(login.data.session,true);
    if(CLOUD.me?.role!=='admin')throw Error('Dein Konto ist angelegt, die Adminrechte müssen geprüft werden.');
@@ -1243,7 +1256,7 @@ async function cloudLogin(){
   if(username==='safa'&&password==='1234'){
    S.page='cloudAdminActivate';render();return;
   }
-  const {data,error}=await CLOUD.sb.auth.signInWithPassword({email:cloudInternalEmail(username),password});
+  const {data,error}=await CLOUD.sb.auth.signInWithPassword({email:cloudInternalEmail(username),password:await cloudBackendPassword(password)});
   if(error)throw Error('Benutzername oder Passwort falsch.');
   await cloudSetSession(data.session,true);
  }catch(e){cloudMessage('Anmeldung fehlgeschlagen: '+(e.message||String(e)))}
@@ -1261,15 +1274,15 @@ async function cloudSaveProfile(){
   await cloudReload(false);render();cloudMessage('Profil online gespeichert.',true);
  }catch(e){cloudMessage(e.message||String(e))}
 }
-async function cloudChangePassword(){try{let pw=$('cloudNewPass').value;if(pw.length<10||pw.length>100)throw Error('Passwort: mindestens 10 Zeichen.');let {error}=await CLOUD.sb.auth.updateUser({password:pw});if(error)throw error;cloudMessage('Passwort geändert.',true)}catch(e){cloudMessage(e.message||String(e))}}
+async function cloudChangePassword(){try{let pw=$('cloudNewPass').value;if(pw.length<8||pw.length>100)throw Error('Passwort: mindestens 8 Zeichen.');let {error}=await CLOUD.sb.auth.updateUser({password:await cloudBackendPassword(pw)});if(error)throw error;cloudMessage('Passwort geändert.',true)}catch(e){cloudMessage(e.message||String(e))}}
 function cloudForgotPassword(){cloudMessage('Passwort vergessen? Bitte wende dich an den Admin. Er kann für dein Konto ein neues Passwort festlegen. E-Mail und Telefonnummer sind freiwillig und dienen nicht der automatischen Passwortwiederherstellung.')}
 async function cloudAdminResetPassword(){
  if(!isAdmin())return;
  try{
   const target=CLOUD.users.find(u=>u.id===CLOUD.editId);if(!target)throw Error('Konto fehlt.');
-  const password=$('cloudResetPassword').value;if(password.length<10||password.length>100)throw Error('Neues Passwort: mindestens 10 Zeichen.');
+  const password=$('cloudResetPassword').value;if(password.length<8||password.length>100)throw Error('Neues Passwort: mindestens 8 Zeichen.');
   if(!confirm('Ein neues Passwort für @'+target.username+' festlegen?'))return;
-  const {data,error}=await CLOUD.sb.functions.invoke('sgd-username-auth',{body:{action:'admin_reset',targetId:target.id,password}});
+  const {data,error}=await CLOUD.sb.functions.invoke('sgd-username-auth',{body:{action:'admin_reset',targetId:target.id,password:await cloudBackendPassword(password)}});
   if(error)throw Error(await cloudReadFunctionError(error,data));
   if(!data?.ok)throw Error(data?.error||'Zurücksetzen fehlgeschlagen.');
   $('cloudResetPassword').value='';cloudMessage('Neues Passwort gespeichert. Teile es der Person nur privat mit.',true);
@@ -1280,17 +1293,17 @@ function cloudRenderAuthPage(){
  if(!CLOUD.ready){app.innerHTML='<div class="card"><h2>Online-Anmeldung wird geladen …</h2></div>';return true}
  if(CLOUD.error&&!CLOUD.sb){app.innerHTML=`<div class="card"><h2>Cloud-Verbindung nicht verfügbar</h2><p>${E(CLOUD.error)}</p><button onclick="location.reload()">Erneut versuchen</button></div>`;return true}
  if(S.page==='cloudAdminActivate'){
- app.innerHTML=`<section class="card account-shell"><span class="tag">S.G.D. · HAUPTADMIN</span><h1>🔑 Admin-Zugang freischalten</h1><p>Der Benutzername <b>safa</b> ist bereits für den Hauptadmin reserviert. Deine erste Anmeldung mit dem Start-PIN <b>1234</b> führt aus Sicherheitsgründen hierher. Der PIN allein schaltet auf der öffentlichen Website keine Adminrechte frei.</p><form onsubmit="event.preventDefault();cloudActivateInitialAdmin()"><label>Benutzername</label><input value="safa" readonly><label>Privater Admin-Code (nur einmal)</label><input id="cloudAdminActivationCode" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="SGD-…" required><label>Dein neues, dauerhaftes Passwort</label><input id="cloudAdminActivationPassword" type="password" autocomplete="new-password" minlength="10" required><label>Neues Passwort wiederholen</label><input id="cloudAdminActivationRepeat" type="password" autocomplete="new-password" minlength="10" required><p id="cloudMsg" hidden></p><div class="auth-actions"><button id="cloudAdminActivationButton" type="submit">Hauptadmin freischalten</button><button type="button" class="outline" onclick="S.page='login';render()">Zurück zur Anmeldung</button></div></form><p class="fine">Nach der Freischaltung meldest du dich direkt mit <b>safa</b> und deinem neuen Passwort an. Das Passwort kannst du unter „Mein Konto“ jederzeit ändern. Dieser Code wird nicht in der Website gespeichert.</p></section>`;return true;
+ app.innerHTML=`<section class="card account-shell"><span class="tag">S.G.D. · HAUPTADMIN</span><h1>🔑 Admin-Zugang freischalten</h1><p>Der Benutzername <b>safa</b> ist bereits für den Hauptadmin reserviert. Deine erste Anmeldung mit dem Start-PIN <b>1234</b> führt aus Sicherheitsgründen hierher. Der PIN allein schaltet auf der öffentlichen Website keine Adminrechte frei.</p><form onsubmit="event.preventDefault();cloudActivateInitialAdmin()"><label>Benutzername</label><input value="safa" readonly><label>Privater Admin-Code (nur einmal)</label><input id="cloudAdminActivationCode" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="SGD-…" required><label>Dein neues, dauerhaftes Passwort (mindestens 8 Zeichen)</label><input id="cloudAdminActivationPassword" type="password" autocomplete="new-password" minlength="8" required><label>Neues Passwort wiederholen (mindestens 8 Zeichen)</label><input id="cloudAdminActivationRepeat" type="password" autocomplete="new-password" minlength="8" required><p id="cloudMsg" hidden></p><div class="auth-actions"><button id="cloudAdminActivationButton" type="submit">Hauptadmin freischalten</button><button type="button" class="outline" onclick="S.page='login';render()">Zurück zur Anmeldung</button></div></form><p class="fine"><b>Passwort-Regel: 8 bis 100 Zeichen.</b> Der vierstellige Start-PIN ist kein dauerhaftes Passwort. Nach der Freischaltung meldest du dich direkt mit <b>safa</b> und deinem neuen Passwort an. Das Passwort kannst du unter „Mein Konto“ jederzeit ändern. Dieser Code wird nicht in der Website gespeichert.</p></section>`;return true;
  }
  if(S.page==='login'){
  app.innerHTML=`<section class="card account-shell"><span class="tag">S.G.D. · GEMEINSAME ONLINE-ANMELDUNG</span><h1>🔐 Agentenkonto</h1><p>Alle Agenten und Admins melden sich über denselben sicheren Zugang an. Keine separaten lokalen Konten mehr.</p><p class="fine">Hauptadmin: Melde dich beim ersten Mal mit <b>safa</b> und dem Start-PIN <b>1234</b> an. Danach bestätigst du deine Adminrechte separat mit dem privaten Einmalcode und legst dein dauerhaftes Passwort fest.</p><form onsubmit="event.preventDefault();cloudLogin()"><label>Benutzername</label><input id="cloudUsernameLogin" autocomplete="username" autocapitalize="none" spellcheck="false" minlength="3" maxlength="24" placeholder="z. B. agent007" required><label>Passwort</label><input id="cloudPassLogin" type="password" autocomplete="current-password" required><p id="cloudMsg" hidden></p><div class="auth-actions"><button type="submit">Anmelden</button><button type="button" class="outline" onclick="S.page='register';render()">Neues Agentenkonto</button><button type="button" class="outline" onclick="cloudForgotPassword()">Passwort vergessen</button></div></form>${cloudAgentNote()}</section>`;return true;
  }
  if(S.page==='register'){
- app.innerHTML=`<section class="card account-shell"><span class="tag">NEUES ONLINE-KONTO</span><h1>🎓 Agentenschüler registrieren</h1><p>Verwende möglichst einen Decknamen statt deines vollständigen Namens.</p><form onsubmit="event.preventDefault();cloudRegister()"><label>Benutzername</label><input id="cloudUsername" autocomplete="username" autocapitalize="none" spellcheck="false" minlength="3" maxlength="24" required><label>E-Mail-Adresse (freiwillig)</label><input id="cloudContactEmail" type="email" autocomplete="email" placeholder="Optional"><label>Telefonnummer (freiwillig)</label><input id="cloudContactPhone" type="tel" autocomplete="tel" placeholder="Optional"><label>Anzeigename</label><input id="cloudDisplay" maxlength="60" placeholder="z. B. Agent Nord"><label>Deckname</label><input id="cloudAlias" maxlength="35"><label>Gruppe (optional)</label><input id="cloudGroup" maxlength="25" autocomplete="off"><label>Passwort (mind. 10 Zeichen)</label><input id="cloudPass" type="password" autocomplete="new-password" minlength="10" required><label>Passwort wiederholen</label><input id="cloudPassRepeat" type="password" autocomplete="new-password" minlength="10" required><p id="cloudMsg" hidden></p><div class="auth-actions"><button id="cloudRegisterSubmit" type="submit">Konto erstellen</button><button type="button" class="outline" onclick="S.page='login';render()">Zur Anmeldung</button></div></form>${cloudAgentNote()}</section>`;return true;
+ app.innerHTML=`<section class="card account-shell"><span class="tag">NEUES ONLINE-KONTO</span><h1>🎓 Agentenschüler registrieren</h1><p>Verwende möglichst einen Decknamen statt deines vollständigen Namens.</p><form onsubmit="event.preventDefault();cloudRegister()"><label>Benutzername</label><input id="cloudUsername" autocomplete="username" autocapitalize="none" spellcheck="false" minlength="3" maxlength="24" required><label>E-Mail-Adresse (freiwillig)</label><input id="cloudContactEmail" type="email" autocomplete="email" placeholder="Optional"><label>Telefonnummer (freiwillig)</label><input id="cloudContactPhone" type="tel" autocomplete="tel" placeholder="Optional"><label>Anzeigename</label><input id="cloudDisplay" maxlength="60" placeholder="z. B. Agent Nord"><label>Deckname</label><input id="cloudAlias" maxlength="35"><label>Gruppe (optional)</label><input id="cloudGroup" maxlength="25" autocomplete="off"><label>Passwort (mind. 8 Zeichen)</label><input id="cloudPass" type="password" autocomplete="new-password" minlength="8" required><label>Passwort wiederholen</label><input id="cloudPassRepeat" type="password" autocomplete="new-password" minlength="8" required><p id="cloudMsg" hidden></p><div class="auth-actions"><button id="cloudRegisterSubmit" type="submit">Konto erstellen</button><button type="button" class="outline" onclick="S.page='login';render()">Zur Anmeldung</button></div></form>${cloudAgentNote()}</section>`;return true;
  }
  if(S.page==='account'){
  if(!CLOUD.me){S.page='login';render();return true}
- const me=CLOUD.me;app.innerHTML=`<section class="card account-shell"><span class="tag">ONLINE-PROFIL</span><h1>👤 ${E(me.username)}</h1><p>${E(ROLE_LABELS[me.role]||me.role)} · Konto in Supabase gespeichert</p><label>Anzeigename</label><input id="cloudProfileName" value="${E(me.displayName)}"><label>Deckname</label><input id="cloudProfileAlias" value="${E(me.alias)}"><label>Gruppe</label><input id="cloudProfileGroup" value="${E(me.group)}"><label>E-Mail-Adresse (freiwillig)</label><input id="cloudProfileEmail" type="email" value="${E(CLOUD.contact.email||'')}"><label>Telefonnummer (freiwillig)</label><input id="cloudProfilePhone" type="tel" value="${E(CLOUD.contact.phone||'')}"><div class="auth-actions"><button onclick="cloudSaveProfile()">Profil speichern</button><button class="outline" onclick="S.page='home';render()">Zurück</button></div><h3>Passwort ändern</h3><input id="cloudNewPass" type="password" minlength="10" placeholder="Neues Passwort (mind. 10 Zeichen)"><button class="outline" onclick="cloudChangePassword()">Passwort ändern</button><p id="cloudMsg" hidden></p><div class="auth-actions"><button class="outline" onclick="cloudLogout()">Abmelden</button></div>${cloudAgentNote()}</section>`;return true;
+ const me=CLOUD.me;app.innerHTML=`<section class="card account-shell"><span class="tag">ONLINE-PROFIL</span><h1>👤 ${E(me.username)}</h1><p>${E(ROLE_LABELS[me.role]||me.role)} · Konto in Supabase gespeichert</p><label>Anzeigename</label><input id="cloudProfileName" value="${E(me.displayName)}"><label>Deckname</label><input id="cloudProfileAlias" value="${E(me.alias)}"><label>Gruppe</label><input id="cloudProfileGroup" value="${E(me.group)}"><label>E-Mail-Adresse (freiwillig)</label><input id="cloudProfileEmail" type="email" value="${E(CLOUD.contact.email||'')}"><label>Telefonnummer (freiwillig)</label><input id="cloudProfilePhone" type="tel" value="${E(CLOUD.contact.phone||'')}"><div class="auth-actions"><button onclick="cloudSaveProfile()">Profil speichern</button><button class="outline" onclick="S.page='home';render()">Zurück</button></div><h3>Passwort ändern</h3><input id="cloudNewPass" type="password" minlength="8" placeholder="Neues Passwort (mind. 8 Zeichen)"><button class="outline" onclick="cloudChangePassword()">Passwort ändern</button><p id="cloudMsg" hidden></p><div class="auth-actions"><button class="outline" onclick="cloudLogout()">Abmelden</button></div>${cloudAgentNote()}</section>`;return true;
  }
  return false;
 }
@@ -1307,7 +1320,7 @@ function cloudRenderAdminAccounts(){
 }
 function cloudOpenEdit(id){if(!isAdmin())return;CLOUD.editId=id;S.page='cloudEditUser';render()}
 function cloudRenderEditUser(){const a=CLOUD.users.find(u=>u.id===CLOUD.editId);if(!a||!isAdmin()){S.page='adminAccounts';render();return}
- app.innerHTML=`<section class="card"><span class="tag">ADMIN · ONLINE-RECHTE</span><h1>⚙️ @${E(a.username)}</h1><p>${E(a.displayName)}</p><label>Rolle</label><select id="cloudEditRole">${Object.entries(ROLE_LABELS).map(([k,v])=>`<option value="${E(k)}" ${a.role===k?'selected':''}>${E(v)}</option>`).join('')}</select><h3>Einzelne Rechte</h3>${PERMISSIONS.map(([k,title,description])=>`<label style="display:flex;gap:10px;align-items:flex-start"><input type="checkbox" style="width:auto;margin-top:5px" id="cloudPerm_${k}" ${a.permissions?.includes(k)?'checked':''}><span><b>${E(title)}</b><small style="display:block;color:#9eb1c7">${E(description)}</small></span></label>`).join('')}<label style="display:flex;gap:8px"><input id="cloudDisabled" type="checkbox" style="width:auto" ${a.disabled?'checked':''}> Konto sperren</label><div style="border-top:1px solid #40576c;margin-top:18px;padding-top:14px"><h3>🔑 Passwort zurücksetzen</h3><p class="fine">Wenn die Person das Passwort vergessen hat, kannst du ihr ein neues vergeben. Das bisherige Passwort wird nicht angezeigt.</p><label>Neues Passwort (mindestens 10 Zeichen)</label><input id="cloudResetPassword" type="password" autocomplete="new-password" minlength="10" placeholder="Neues Passwort"><button type="button" class="outline" onclick="cloudAdminResetPassword()">Passwort neu vergeben</button></div><p id="cloudMsg" hidden></p><div class="auth-actions"><button onclick="cloudSaveAgentAccess()">Berechtigungen speichern</button><button class="outline" onclick="S.page='adminAccounts';render()">Zurück</button></div></section>`
+ app.innerHTML=`<section class="card"><span class="tag">ADMIN · ONLINE-RECHTE</span><h1>⚙️ @${E(a.username)}</h1><p>${E(a.displayName)}</p><label>Rolle</label><select id="cloudEditRole">${Object.entries(ROLE_LABELS).map(([k,v])=>`<option value="${E(k)}" ${a.role===k?'selected':''}>${E(v)}</option>`).join('')}</select><h3>Einzelne Rechte</h3>${PERMISSIONS.map(([k,title,description])=>`<label style="display:flex;gap:10px;align-items:flex-start"><input type="checkbox" style="width:auto;margin-top:5px" id="cloudPerm_${k}" ${a.permissions?.includes(k)?'checked':''}><span><b>${E(title)}</b><small style="display:block;color:#9eb1c7">${E(description)}</small></span></label>`).join('')}<label style="display:flex;gap:8px"><input id="cloudDisabled" type="checkbox" style="width:auto" ${a.disabled?'checked':''}> Konto sperren</label><div style="border-top:1px solid #40576c;margin-top:18px;padding-top:14px"><h3>🔑 Passwort zurücksetzen</h3><p class="fine">Wenn die Person das Passwort vergessen hat, kannst du ihr ein neues vergeben. Das bisherige Passwort wird nicht angezeigt.</p><label>Neues Passwort (mindestens 8 Zeichen)</label><input id="cloudResetPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Neues Passwort"><button type="button" class="outline" onclick="cloudAdminResetPassword()">Passwort neu vergeben</button></div><p id="cloudMsg" hidden></p><div class="auth-actions"><button onclick="cloudSaveAgentAccess()">Berechtigungen speichern</button><button class="outline" onclick="S.page='adminAccounts';render()">Zurück</button></div></section>`
 }
 async function cloudSaveAgentAccess(){if(!isAdmin())return;try{const target=CLOUD.users.find(u=>u.id===CLOUD.editId);if(!target)throw Error('Konto fehlt');const perms=PERMISSIONS.filter(([id])=>$('cloudPerm_'+id)?.checked).map(([id])=>id);const {error}=await CLOUD.sb.rpc('sgd_set_agent_access',{target_id:target.id,next_role:$('cloudEditRole').value,next_permissions:perms,next_disabled:$('cloudDisabled').checked});if(error)throw error;await cloudReload(false);S.page='adminAccounts';render()}catch(e){cloudMessage(e.message||String(e))}}
 async function cloudPushScore(entry){if(!cloudEnabled()||!CLOUD.me)return;try{let {error}=await CLOUD.sb.from('sgd_results').insert({user_id:CLOUD.me.id,alias:entry.alias,points:entry.points,duration:entry.duration,success:entry.success,mode:entry.mode});if(error)throw error;await cloudReload(false)}catch(e){console.warn('Ergebnis-Upload:',e);alert('Das Prüfungsergebnis konnte nicht online gespeichert werden. Prüfe deine Verbindung: '+e.message)}}
