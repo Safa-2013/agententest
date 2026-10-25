@@ -1,0 +1,41 @@
+S.G.D. AGENTENAKADEMIE – KOSTENLOSE HANDY-APP
+=================================================
+
+WAS IST DAS?
+Die S.G.D.-App ist eine installierbare Web-App (PWA). Sie kostet nichts,
+und deine Freunde können sie wie eine App vom iPhone- oder Android-Startbildschirm öffnen.
+Sie erscheint NICHT im Apple App Store. Der App Store erfordert normalerweise
+99 USD/Jahr für das Apple Developer Program und eine Prüfung durch Apple.
+
+ICH HABE VORBEREITET
+- Deine komplette bestehende index.html (Benutzerkonten und Supabase bleiben erhalten)
+- Dein blau-goldenes S.G.D.-Logo als iPhone-App-Symbol (statt "Sy")
+- Manifest-Datei, zwei große App-Icons, 180px Apple-Icon und Favicon
+- Offline-Shell/Serviceworker für schnelleren Start (Online-Anmeldung benötigt Internet)
+
+WAS DU EINMAL MACHEN MUSST (GITHUB)
+1. Öffne https://github.com/Safa-2013/agententest
+2. Lade die 7 Dateien aus diesem Ordner ins HAUPTVERZEICHNIS des Repositories:
+   index.html, manifest.webmanifest, sgd-worker.js,
+   sgd-icon-192.png, sgd-icon-512.png,
+   sgd-apple-touch-icon.png und sgd-favicon.png.
+3. Bestehende Dateien mit gleichem Namen ERSETZEN; Änderungen committen.
+4. Öffne https://safa-2013.github.io/agententest/ in Safari.
+
+AUF DEM IPHONE
+1. Safari öffnen und die oben genannte Website besuchen.
+2. Das Seitenmenü/Teilen öffnen > "Zu Home-Bildschirm hinzufügen".
+3. "Als Web-App öffnen" einschalten, falls angezeigt > Hinzufügen.
+4. Falls noch "Sy" sichtbar ist: bisherige Homescreen-Verknüpfung
+   löschen, Seite neu in Safari öffnen und erneut hinzufügen.
+
+AUF ANDROID
+Chrome öffnen > Website besuchen > Menü > App installieren
+(oder "Zum Startbildschirm hinzufügen").
+
+WICHTIG
+- Das Paket wurde vorbereitet, NICHT selbstständig nach GitHub hochgeladen.
+- Chats, Prüfungen, Anmeldung und QR-Profile sind online; nur die Oberfläche
+  kann beim Verbindungsverlust teilweise aus dem Cache geladen werden.
+- Apple-App-Store-Veröffentlichung erfolgt nicht automatisch.
+- Keine Passwörter oder geheimen Server-Schlüssel in HTML-Dateien eintragen.

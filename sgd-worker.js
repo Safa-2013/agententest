@@ -1,5 +1,5 @@
 /* S.G.D. Offline-Shell: niemals Konto-, API- oder Antwortdaten cachen. */
-const SGD_SHELL='sgd-shell-v18-21';
+const SGD_SHELL='sgd-shell-freeapp-v1';
 const SGD_FILES=['./index.html','./manifest.webmanifest','./sgd-icon-192.png','./sgd-icon-512.png'];
 self.addEventListener('install',event=>{
   self.skipWaiting();
