@@ -1,0 +1,12 @@
+S.G.D. AGENTENAKADEMIE · V23 – RANGABHÄNGIGE SPIELE
+
+NEU:
+- Agentenschüler und Agent sehen alle einfachen Grundausbildungs-Minispiele und die freigegebenen Online-Trainingsspiele.
+- Ab Spezialagent werden Spezialspiele freigeschaltet, auch für höhere Ränge und den CEO.
+- S.G.D. Agenten-Arena ist als spielbare 2D-Solo-Demo enthalten (Touch + Tastatur).
+- S.G.D. City (3D) und S.G.D. Survival sind nur geplante Modi, noch nicht spielbar.
+- Admin kann Online-Spiele je nach Mindest-Rang freigeben. Server prüft den echten Rang.
+
+INSTALLATION:
+Alle Dateien des Web-App-Ordners entpackt in das Hauptverzeichnis von Safa-2013/agententest auf GitHub laden. Die Website läuft weiter wie bisher.
+Supabase ist für die Rangregel vorbereitet. Bestehende Konten bleiben erhalten.
