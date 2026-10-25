@@ -1,0 +1,56 @@
+S.G.D. AGENTENAKADEMIE – KOMPLETTPAKET V18–V21
+Nur für Spielzwecke. Stand: 25.10.2026
+
+INHALT
+- index.html             Die komplette aktualisierte Agentenakademie (V1–V17 bleiben enthalten).
+- manifest.webmanifest   Installationsinformationen für Mobilgeräte.
+- sgd-worker.js          Offline-Startseite, keine Speicherung privater API- oder Kontodaten.
+- sgd-icon-192.png       App-Icon aus dem bestehenden S.G.D.-Logo.
+- sgd-icon-512.png       App-Icon aus dem bestehenden S.G.D.-Logo.
+- Bilder                 Vorschauen der neuen Oberfläche (nur Testdaten).
+
+INSTALLATION AUF GITHUB PAGES
+1. GitHub-Repositorium öffnen: https://github.com/Safa-2013/agententest
+2. Die bestehende index.html im Hauptordner durch die neue index.html ersetzen.
+3. ZUSÄTZLICH manifest.webmanifest, sgd-worker.js, sgd-icon-192.png und sgd-icon-512.png
+   IN DENSELBEN HAUPTORDNER hochladen (nicht in Unterordner).
+4. Commit changes wählen. Dann auf https://safa-2013.github.io/agententest/?v=18-21 öffnen.
+5. Wenn noch alte Ansichten sichtbar sind: Website neu laden / Safari-Tab schließen und erneut öffnen.
+
+NEU IN DIESER VERSION
+V18 – Fiktive Fallmeldungen, eigene Fallnummern, Adminprüfung, Dienststatus, CEO-Tagesbericht.
+V19 – Geschützte kleine JPG-/PDF-Belege für Fälle, Aufgaben und Missionen;
+      Live-Synchronisierung für Nachrichten und Aufträge, Offline-Startoberfläche.
+V20 – Beförderungsanzeige, Rangänderungen, PNG-Spielurkunde, unveränderter Agenten-QR-Code.
+V21 – Verknüpfung von fiktiven Fallakten, Belegen und Aufgaben; Berichtspflicht und Archiv.
+Alle bisherigen Missionen, Rangprüfungen, Chats, Agentenkonten und Ausweise bleiben erhalten.
+
+SCHUTZ DER DATEN
+- Fallbelege sind NICHT öffentlich. Zugriff nur für beteiligte Konten mit serverseitiger Prüfung.
+- JPG/PDF-Anhänge: maximal ca. 130 KB und fünf Anhänge pro Fallakte.
+- Keine Fotos echter Mitschüler, keine echten Schülernamen oder persönlichen Dokumente hochladen.
+- Schulkonflikte nicht selbst auflösen oder körperlich eingreifen; zuständige Erwachsene informieren.
+
+WICHTIGE GRENZEN / NOCH OFFENE LIVE-TESTS
+- Online-Speicherung/Chats erfordern Internet.
+- Push-Benachrichtigungen bei GESCHLOSSENER App sind noch nicht aktiviert. Dazu sind
+  Web-Push-Abonnements, ein VAPID-Schlüsselpaar und ein sicherer Versanddienst nötig.
+- Die App bietet Browserhinweise bei geöffneter Website (wenn vom Browser unterstützt und erlaubt).
+- Die CEO-JSON-Sicherung wird MANUELL heruntergeladen und enthält nur Daten,
+  die das Admin-Konto über die berechtigten API-Zugriffe auslesen kann; keine Passwörter oder Chats.
+  Automatische Supabase-Plattformbackups wurden nicht eingerichtet.
+- Die Offline-Oberfläche ermöglicht keine Offline-Anmeldung oder Offline-Synchronisierung.
+- Echte Live-Nachrichten, QR-Scan und Echtzeitupdates mit ZWEI verschiedenen Mobilgeräten
+  müssen nach der Veröffentlichung noch geprüft werden.
+
+SUPABASE
+Die Datenbank für V18–V21 ist bereits im S.G.D.-Projekt vorbereitet.
+Kein neues Supabase-Projekt und kein Reset bestehender Daten nötig.
+
+HAUPTADMIN
+Der bestehende Hauptadmin 'safa' bleibt CEO. Rangrechte werden im Backend geprüft.
+Keine dauerhaften Passwörter oder geheimen Schlüssel in diesem Paket.
+
+HINWEIS
+Dieses Angebot ist ein fiktives Detektiv-Rollenspiel.
+„Nur für Spielzwecke“ steht weiterhin auf den Spielausweisen und den neuen Seiten.
