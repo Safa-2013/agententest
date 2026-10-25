@@ -1,6 +1,6 @@
 /* S.G.D. Offline-Shell: niemals Konto-, API- oder Antwortdaten cachen. */
-const SGD_SHELL='sgd-shell-freeapp-v1';
-const SGD_FILES=['./index.html','./manifest.webmanifest','./sgd-icon-192.png','./sgd-icon-512.png'];
+const SGD_SHELL='sgd-shell-freeapp-v2';
+const SGD_FILES=['./index.html','./manifest.webmanifest','./sgd-icon-192.png','./sgd-icon-512.png','./sgd-apple-touch-icon.png'];
 self.addEventListener('install',event=>{
   self.skipWaiting();
   event.waitUntil(caches.open(SGD_SHELL).then(cache=>Promise.allSettled(SGD_FILES.map(file=>cache.add(file)))));
