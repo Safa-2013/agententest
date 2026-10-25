@@ -1,0 +1,29 @@
+S.G.D. AGENTENAKADEMIE V22 – WEBSITE UND INSTALLIERBARE APP
+===========================================================
+
+NEU IN V22:
+- Vier Minispiele (Memory, Reaktion, Zahlenjagd, Codeknacker).
+- Online-Spielehalle mit drei fertigen Spielen; Admin kann eigene Quiz- und Codeknacker-Spiele erstellen.
+- Privater Agenten-Dienstkalender: Admin erstellt Termine für alle oder einzelne Agenten.
+- Agentenakte: eigene Online-Spielergebnisse, Prüfungen, Agentenausweis.
+- Ideen und Fehlermeldungen an die Spielleitung.
+- Privatsphäre: persönlicher Datenexport sowie Lösch-, Daten- und Passworthilfe-Anfragen.
+- Mobile Schnellnavigation am unteren Rand.
+- Große Logos aus dem HTML ausgelagert: schnellere HTML-Übertragung und Caching.
+
+GITHUB PAGES – ALLES HOCHLADEN:
+1. ZIP entpacken, dann ALLE Dateien aus dem Ordner auf https://github.com/Safa-2013/agententest in das Repository-Hauptverzeichnis laden.
+2. Gleichnamige bestehende Dateien ersetzen. Neue Dateien sgd-logo.png und sgd-print-logo.jpg ZUSÄTZLICH hochladen.
+3. Änderungen mit Commit changes speichern.
+4. https://safa-2013.github.io/agententest/ aufrufen, neu laden. Auf dem iPhone den alten Startbildschirm-Link bei Bedarf entfernen und neu hinzufügen.
+
+WICHTIG:
+Die HTML-Datei allein reicht bei V22 NICHT, weil das bisher eingebettete Original-Logo nun aus zwei separaten Bildern geladen wird. Alle 9 Web-Dateien müssen im selben Ordner liegen.
+Supabase-Änderungen für Spiele, Kalender, Feedback und Anfragen sind bereits angewendet. Bestehende Konten/Spielstände bleiben erhalten.
+
+GRENZEN / SICHERHEIT:
+- Die 4 Browser-Minispiele geben nur lokale Übungsergebnisse. Online-Quizspiele haben serverseitige Auswertung.
+- „Kontolöschung anfragen“ ist eine Anfrage, keine automatische Löschung. Passwortwiederherstellung via echte E-Mail ist für bestehende intern adressierte Nutzer noch nicht aktiv.
+- Echte Push bei vollständig geschlossener App und automatisierte externe Backups sind noch nicht eingerichtet.
+- Zum realen Mehrgeräte- und QR-Test braucht man zwei eigenständig angemeldete Handys.
+- Spielausweise und Ermittlungen sind rein fiktiv. Keine echten Konflikte selbst körperlich lösen.
