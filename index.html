@@ -403,7 +403,7 @@ button{touch-action:manipulation;user-select:none;-webkit-user-select:none}
 .sgd23-controls button{touch-action:none;user-select:none;-webkit-user-select:none;border:1px solid #65879f;background:#24465f;color:white;border-radius:12px;font-size:24px;font-weight:900;min-width:53px;min-height:51px;padding:7px}
 .sgd23-controls button:active{background:#358c88}.sgd23-controls .sgd23-fire{height:92px;min-width:98px;border-radius:50%;border:3px solid #ffcf7a;background:#aa6c30;font-size:34px;display:flex;flex-direction:column;align-items:center;justify-content:center}.sgd23-fire small{font-size:12px}
 @media(max-width:560px){.sgd23-controls button{min-width:47px;min-height:48px}.sgd23-controls .sgd23-fire{min-width:83px;height:83px}.sgd23-premium-head h2{font-size:20px}}
-</style></head><body><header><strong>◈ S.G.D. / GEHEIMDIENST</strong><div class="auth-header"><button class="outline" id="accountNav" onclick="openAccount()">👤 ANMELDUNG</button></div></header><section id="sgd-install-bar" aria-label="S.G.D.-App installieren">
+</style><style>.sgd27-next{margin:16px 0}.sgd27-next h2{margin:8px 0}.sgd27-next p{overflow-wrap:anywhere}.sgd27-next button{max-width:100%;white-space:normal}</style></head><body><header><strong>◈ S.G.D. / GEHEIMDIENST</strong><div class="auth-header"><button class="outline" id="accountNav" onclick="openAccount()">👤 ANMELDUNG</button></div></header><section id="sgd-install-bar" aria-label="S.G.D.-App installieren">
 <img class="sgd-install-mark" src="./sgd-apple-touch-icon.png" alt="S.G.D.-Agentenlogo" loading="eager">
 <div class="sgd-install-copy"><strong>S.G.D. als App aufs Handy</strong><span>Kostenlos für iPhone und Android</span></div>
 <button type="button" class="sgd-install-trigger" id="sgd-install-trigger">📲 App installieren</button>
@@ -2170,6 +2170,7 @@ const SGD22={identity:null,catalog:[],adminGames:[],calendar:[],feedback:[],requ
   reactionTimer:null,reactionStarted:0,reactionState:'idle',playRank:null,arena:null,arenaInterval:null};
 const sgd22Esc=x=>E(String(x??''));
 function sgd22Reset(){let uid=CLOUD.me?.id||null;if(SGD22.identity===uid)return;
+ if(typeof window.sgd25CloseAction==='function')window.sgd25CloseAction();
  if(SGD22.reactionTimer)clearTimeout(SGD22.reactionTimer);
  sgd23StopArena();
  Object.assign(SGD22,{identity:uid,catalog:[],adminGames:[],calendar:[],feedback:[],requests:[],dossier:null,users:[],game:null,kind:null,builtin:null,selection:{},pageLoading:false,error:'',success:'',editorRows:[],editing:null,adminLoaded:false,memory:null,locks:false,arcadeMessage:'',arcadeDone:false,arcadeTime:null,reactionTimer:null,reactionStarted:0,reactionState:'idle',playRank:null,arena:null,arenaInterval:null});
@@ -2199,6 +2200,7 @@ async function sgd22Load(page=S.page){if(!sgd15Logged())return;sgd22Reset();cons
  try{
   if(page==='sgd22Games'||page==='sgd22Admin'){
     const [cat,rank]=await Promise.all([sgd22RPC('sgd22_games_catalog'),sgd22RPC('sgd22_play_rank')]);
+    if(CLOUD.me?.id!==uid)return;
     SGD22.catalog=Array.isArray(cat)?cat:[];SGD22.playRank=rank;
    if(sgd15Admin()&&page==='sgd22Admin'){
     let [games,users,fb,req]=await Promise.all([
@@ -2207,20 +2209,21 @@ async function sgd22Load(page=S.page){if(!sgd15Logged())return;sgd22Reset();cons
       CLOUD.sb.from('sgd22_feedback').select('*').order('created_at',{ascending:false}).limit(100),
       CLOUD.sb.from('sgd22_account_requests').select('*').order('created_at',{ascending:false}).limit(100)
     ]);
-    for(let r of [games,users,fb,req])if(r.error)throw r.error;
+    if(CLOUD.me?.id!==uid)return;
+    for(let r of [games,users,fb,req])if(CLOUD.me?.id!==uid)return;if(r.error)throw r.error;
     SGD22.adminGames=games.data||[];SGD22.users=users.data||[];SGD22.feedback=fb.data||[];SGD22.requests=req.data||[];SGD22.adminLoaded=true;
    }
   }
   if(page==='sgd22Calendar'){
-   let r=await CLOUD.sb.from('sgd22_calendar').select('id,title,details,starts_at,ends_at,audience,recipient_id,author_id').gte('ends_at',new Date(Date.now()-86400000*2).toISOString()).order('starts_at',{ascending:true}).limit(180);if(r.error)throw r.error;SGD22.calendar=r.data||[];
+   let r=await CLOUD.sb.from('sgd22_calendar').select('id,title,details,starts_at,ends_at,audience,recipient_id,author_id').gte('ends_at',new Date(Date.now()-86400000*2).toISOString()).order('starts_at',{ascending:true}).limit(180);if(CLOUD.me?.id!==uid)return;if(r.error)throw r.error;SGD22.calendar=r.data||[];
    if(sgd15Admin()&&!SGD22.users.length){let u=await CLOUD.sb.from('sgd_profiles').select('id,username,alias,role,disabled').limit(250);if(u.error)throw u.error;SGD22.users=u.data||[]}
   }
-  if(page==='sgd22Dossier')SGD22.dossier=await sgd22RPC('sgd22_my_dossier');
-  if(page==='sgd22Feedback'){let r=await CLOUD.sb.from('sgd22_feedback').select('*').order('created_at',{ascending:false}).limit(100);if(r.error)throw r.error;SGD22.feedback=r.data||[]}
-  if(page==='sgd22Privacy'){let r=await CLOUD.sb.from('sgd22_account_requests').select('*').order('created_at',{ascending:false}).limit(100);if(r.error)throw r.error;SGD22.requests=r.data||[]}
+  if(page==='sgd22Dossier'){const dossier=await sgd22RPC('sgd22_my_dossier');if(CLOUD.me?.id!==uid)return;SGD22.dossier=dossier;}
+  if(page==='sgd22Feedback'){let r=await CLOUD.sb.from('sgd22_feedback').select('*').order('created_at',{ascending:false}).limit(100);if(CLOUD.me?.id!==uid)return;if(r.error)throw r.error;SGD22.feedback=r.data||[]}
+  if(page==='sgd22Privacy'){let r=await CLOUD.sb.from('sgd22_account_requests').select('*').order('created_at',{ascending:false}).limit(100);if(CLOUD.me?.id!==uid)return;if(r.error)throw r.error;SGD22.requests=r.data||[]}
   if(CLOUD.me?.id!==uid)return;
- }catch(e){SGD22.error='Daten konnten nicht geladen werden: '+(e.message||String(e))}
- finally{SGD22.pageLoading=false;if(String(S.page).startsWith('sgd22')&&S.page===page)render();}
+ }catch(e){if(CLOUD.me?.id!==uid)return;SGD22.error='Daten konnten nicht geladen werden: '+(e.message||String(e))}
+ finally{if(CLOUD.me?.id===uid){SGD22.pageLoading=false;if(String(S.page).startsWith('sgd22')&&S.page===page)render();}}
 }
 async function sgd22OpenOnline(id){try{const chosen=SGD22.catalog.find(x=>x.id===id);if(chosen&&SGD22.playRank&&Number(SGD22.playRank.level)<Number(chosen.required_level||10))throw Error('Dieses Spiel wird erst ab '+sgd23MinLabel(chosen.required_level)+' freigeschaltet.');const g=await sgd22RPC('sgd22_open_game',{p_id:id});SGD22.game=g;SGD22.selection={};SGD22.arcadeDone=false;SGD22.error='';S.page='sgd22OnlinePlay';render();window.scrollTo(0,0)}catch(e){sgd22Msg(e.message||String(e))}}
 function sgd22Pick(i,value){SGD22.selection[i]=String(value);render()}
@@ -2382,8 +2385,30 @@ function sgd25OpenAction(mode){
  const overlay=document.createElement('div');overlay.id='sgd25-action';overlay.style.cssText='position:fixed;inset:0;z-index:999999;background:#080e14;height:100dvh';
  const frame=document.createElement('iframe');frame.src='sgd-action-3d.html?mode='+encodeURIComponent(mode);frame.title='S.G.D. Action 3D';frame.allow='fullscreen';frame.allowFullscreen=true;frame.style.cssText='width:100%;height:100%;border:0';overlay.append(frame);document.body.append(overlay);
  const previous=document.body.style.overflow;document.body.style.overflow='hidden';
- function close(e){if(e.origin!==location.origin||e.source!==frame.contentWindow||e.data?.type!=='sgd25-close')return;overlay.remove();document.body.style.overflow=previous;window.removeEventListener('message',close);if(document.fullscreenElement===overlay)document.exitFullscreen().catch(()=>{});try{screen.orientation?.unlock()}catch{}}
+ function cleanup(){overlay.remove();document.body.style.overflow=previous;window.removeEventListener('message',close);if(window.sgd25CloseAction===cleanup)window.sgd25CloseAction=null;if(document.fullscreenElement===overlay)document.exitFullscreen().catch(()=>{});try{screen.orientation?.unlock()}catch{}}
+ function close(e){if(e.origin!==location.origin||e.source!==frame.contentWindow||e.data?.type!=='sgd25-close')return;cleanup()}
+ window.sgd25CloseAction=cleanup;
  window.addEventListener('message',close);
  if(overlay.requestFullscreen)overlay.requestFullscreen().then(()=>screen.orientation?.lock?.('landscape')).catch(()=>{});
 }
+
+/* V27: recommendations use existing account-scoped progress. No extra stored data. */
+function sgd27NextStepModel({stage,saved,tasks,uid,admin}){
+ if(admin)return {title:'Deine Zentrale wartet',text:'Prüfe neue Meldungen und Aufträge in deiner Einsatzzentrale.',button:'Einsatzzentrale öffnen',target:'hub'};
+ const open=(tasks||[]).filter(t=>String(t.agent_id)===String(uid)&&['assigned','accepted','in_progress','revision'].includes(t.status));
+ open.sort((a,b)=>{const revision=(b.status==='revision')-(a.status==='revision');if(revision)return revision;return (Date.parse(a.due_at)||Infinity)-(Date.parse(b.due_at)||Infinity)});
+ if(open.length)return {title:open[0].status==='revision'?'Deinen Bericht überarbeiten':'Deinen nächsten Auftrag bearbeiten',text:String(open[0].title||'Offener Auftrag'),button:'Meine Aufträge öffnen',target:'tasks'};
+ if(saved)return {title:'Deine Prüfung fortsetzen',text:'Es gibt einen gespeicherten Prüfungsstand für dein Konto. Öffne die Prüfungsübersicht, um fortzufahren.',button:'Zur gespeicherten Prüfung',target:'career'};
+ if(stage<0)return {title:'Deine Grundausbildung abschließen',text:'Beginne mit der Agentenausbildung. Danach öffnet sich dein Weg zu den höheren Rängen.',button:'Ausbildung öffnen',target:'career'};
+ if(stage<5){const names=['Spezialagent','Ermittler','Oberkommissar','Chefermittler','Elite-Agent'];return {title:'Dein nächstes Ziel: '+names[stage],text:'Trainiere für deine nächste Rangprüfung. Die Voraussetzungen siehst du in der Prüfungsübersicht.',button:'Nächste Rangprüfung ansehen',target:'career'}};
+ return {title:'Deine nächste Mission wartet',text:'Du hast alle regulären Rangprüfungen bestanden. Entdecke weitere Fälle und Aufträge.',button:'Missionen öffnen',target:'missions'};
+}
+function sgd27NextStepHTML(){
+ const me=activeAccount();if(!me)return '';
+ const next=sgd27NextStepModel({stage:careerStage(),saved:!!careerStoredProgress(),tasks:SGD16.identity===me.id&&SGD16.loaded?SGD16.tasks:[],uid:me.id,admin:sgd15Admin()});
+ return `<section class="sgd15-panel sgd27-next" aria-labelledby="sgd27-next-title"><span class="sgd15-overline">MEIN NÄCHSTER SCHRITT</span><h2 id="sgd27-next-title">${E(next.title)}</h2><p>${E(next.text)}</p><button onclick="sgd27OpenNext('${next.target}')">${E(next.button)} →</button></section>`;
+}
+function sgd27OpenNext(target){if(!sgd15Logged()){S.page='login';render();return}if(target==='career')sgd15OpenCareer();else if(target==='tasks')sgd15Go('sgd16Tasks');else if(target==='hub')sgd15Go('sgd18Hub');else sgd15Go('sgd15Missions')}
+const sgd27PreviousHome=sgd15HomeDashboard;
+sgd15HomeDashboard=function(){return sgd27PreviousHome().replace('<div class="sgd15-home-grid">',sgd27NextStepHTML()+'<div class="sgd15-home-grid">')};
 </script></body></html>
